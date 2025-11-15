@@ -1,42 +1,48 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, UploadFile, File
 from ultralytics import YOLO
-import os, tempfile
+import easyocr
+import cv2
+import numpy as np
 
 app = FastAPI()
-model = YOLO("yolo11n.pt")
 
-@app.post("/scan")
-async def predict(file: UploadFile = File(...)):
-    #post temporary file
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp:
-        temp.write(await file.read())
-        temp_path = temp.name
+# Load YOLO model
+model = YOLO("runs/detect/train13/weights/best.pt")
 
-    try:
-        #Run yolo
-        results = model(temp_path)
+# EasyOCR with GPU
+reader = easyocr.Reader(['en'], gpu=True)
 
-        #catch detection
-        boxes = results[0].boxes.xyxy.tolist() if results[0].boxes is not None else []
-        classes = results[0].boxes.cls.tolist() if results[0].boxes is not None else []
-        confs = results[0].boxes.conf.tolist() if results[0].boxes is not None else []
+@app.post("/detect")
+async def detect(file: UploadFile = File(...)):
+    contents = await file.read()
+    npimg = np.frombuffer(contents, np.uint8)
+    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
-        return {
-            "num_detections": len(boxes),
-            "detections": [
-                {"box": box, "class": cls, "confidence": conf}
-                for box, cls, conf in zip(boxes, classes, confs)
-            ]
-        }
+    results = model(img)
 
-    finally:
-        #Delete file
-        try:
-            os.remove(temp_path)
-        except PermissionError:
-            import time
-            time.sleep(0.2)
-            try:
-                os.remove(temp_path)
-            except Exception as e:
-                print(f"Failed to delete file: {e}")
+    plate_text = None
+
+    for box in results[0].boxes:
+        cls = int(box.cls)
+        cls_name = results[0].names[cls]
+        print("Detected:", cls_name)
+
+        if cls_name == "license_plate":
+            x1, y1, x2, y2 = map(int, box.xyxy[0])
+            crop = img[y1:y2, x1:x2]
+
+            gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+            _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+            # Detail=1 supaya ada confidence + bbox
+            ocr = reader.readtext(binary, allowlist='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+
+            if len(ocr) > 0:
+                # Text with biggest confidence
+                best = max(ocr, key=lambda x: x[2])
+                plate_text = best[1]
+                
+    return {
+        "plate_number": plate_text,
+        "success": plate_text is not None
+    }

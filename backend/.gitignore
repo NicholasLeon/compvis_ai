@@ -1,5 +1,6 @@
 # Dataset
 data/
+dataid/
 *.zip
 *.rar
 *.tar.gz
