@@ -3,20 +3,19 @@ from ultralytics import YOLO
 import os, tempfile
 
 app = FastAPI()
-model = YOLO("yolov8n.pt")
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "yolo11n.pt")
+model = YOLO(MODEL_PATH)
 
 @app.post("/scan")
 async def predict(file: UploadFile = File(...)):
-    #post temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp:
         temp.write(await file.read())
         temp_path = temp.name
 
     try:
-        #Run yolo
         results = model(temp_path)
-
-        #catch detection
         boxes = results[0].boxes.xyxy.tolist() if results[0].boxes is not None else []
         classes = results[0].boxes.cls.tolist() if results[0].boxes is not None else []
         confs = results[0].boxes.conf.tolist() if results[0].boxes is not None else []
@@ -28,15 +27,8 @@ async def predict(file: UploadFile = File(...)):
                 for box, cls, conf in zip(boxes, classes, confs)
             ]
         }
-
     finally:
-        #Delete file
         try:
             os.remove(temp_path)
-        except PermissionError:
-            import time
-            time.sleep(0.2)
-            try:
-                os.remove(temp_path)
-            except Exception as e:
-                print(f"Failed to delete file: {e}")
+        except:
+            pass

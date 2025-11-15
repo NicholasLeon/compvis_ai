@@ -3,7 +3,7 @@ import os
 
 
 image_path = os.path.abspath("test.jpg") #dummy image
-model = YOLO("yolov8n.pt")
+model = YOLO("yolo11n.pt")
 
 results = model(image_path)
 
