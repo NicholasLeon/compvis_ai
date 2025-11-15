@@ -1,0 +1,14 @@
+# Dataset
+data/
+*.zip
+*.rar
+*.tar.gz
+
+# Output Train YOLO
+runs/
+
+# Environment dan Cache Python
+__pycache__/
+.venv/
+venv/
+*.pyc
