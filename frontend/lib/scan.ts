@@ -1,5 +1,6 @@
 "use server";
 
+import { log } from "console";
 import fs from "fs";
 import path from "path";
 
@@ -13,6 +14,9 @@ export async function scanImage() {
 
   console.log("File to send:", blob);
   console.log("FormData entries:");
+  // for (let [key, value] of formData.entries()) {
+  //   console.log(key, value);
+  // }
 
   const res = await fetch("http://127.0.0.1:8000/scan", {
     method: "POST",
@@ -26,5 +30,6 @@ export async function scanImage() {
   }
 
   const data = await res.json();
+  log(data);
   return data;
 }
