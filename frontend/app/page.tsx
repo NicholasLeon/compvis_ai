@@ -1,11 +1,5 @@
-import { scanImage } from "@/lib/scan";
+import HeroScanner from "./components/hero";
 
-export default async function Page() {
-  const result = await scanImage();
-
-  return (
-    <main>
-      <pre>{JSON.stringify(result, null, 2)}</pre>
-    </main>
-  );
+export default function Home() {
+  return <HeroScanner />;
 }

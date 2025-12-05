@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
 import easyocr
 import cv2
@@ -6,6 +7,15 @@ import numpy as np
 import re
 
 app = FastAPI()
+
+# Fix CORS block di frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # atau ["http://localhost:4040"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 1. Load Model
 model = YOLO("runs/detect/train3/weights/best.pt")
@@ -32,7 +42,7 @@ def smart_fix_plate(parts):
     to_char, to_int = get_char_replacements()
     
     # --- LOGIKA BARU: Pre-Check Splitter ---
-    # Cek setiap potong, siapa tau ada Prefix+Angka nempel
+    # Cek setiap potong, siapatau ada Prefix+Angka nempel
     expanded_parts = []
     for p in parts:
         # Regex 1: Pola Prefix Nempel Angka
