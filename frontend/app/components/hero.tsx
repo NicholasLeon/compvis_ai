@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { scanLicensePlate } from "@/lib/scan";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Helper: Ubah file gambar jadi string Base64 biar bisa disimpan sementara
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -60,7 +59,7 @@ export default function HeroScanner() {
   };
 
   return (
-    <div className="flex-1 flex flex-col justify-center items-center text-center px-4 w-full relative z-0 py-20">
+    <div className="min-h-screen flex flex-col justify-center items-center text-center px-4 w-full relative z-0 -mt-16 sm:-mt-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -68,7 +67,7 @@ export default function HeroScanner() {
       >
         <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-white">
           Verifikasi Instan <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-[#FAA916] to-white">
             Plat Kendaraan!
           </span>
         </h1>
@@ -85,7 +84,7 @@ export default function HeroScanner() {
         transition={{ delay: 0.2, duration: 0.4 }}
         className="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center"
       >
-        <button className="group flex items-center justify-center gap-3 px-6 py-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-orange-500/50 transition-all font-semibold text-white">
+        <button className="group flex items-center justify-center gap-3 px-6 py-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-[#FAA916] transition-all font-semibold text-white">
           <span className="text-xl group-hover:scale-110 transition-transform">
             ⌨️
           </span>
@@ -95,7 +94,7 @@ export default function HeroScanner() {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={isLoading}
-          className="relative group flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 hover:to-orange-500 transition-all font-semibold text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40"
+          className="relative group flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-gradient-to-br from-orange-500 to-[#FAA916] hover:bg-amber-50 transition-all font-semibold text-white shadow-lg"
         >
           {isLoading ? (
             <motion.div
@@ -104,9 +103,7 @@ export default function HeroScanner() {
               className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full"
             />
           ) : (
-            <span className="text-xl group-hover:rotate-12 transition-transform">
-              📷
-            </span>
+            <span className="text-xl group-hover:rotate-12 transition-transform"></span>
           )}
           <span>{isLoading ? "Memproses..." : "Scan Foto"}</span>
         </button>
