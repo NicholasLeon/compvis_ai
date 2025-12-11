@@ -1,46 +1,33 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getVehicleByPlate } from "@/lib/vehicle";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const plate = searchParams.get("plate");
-  console.log("Test API Request yang masuk ke /api/vehicleDataMatching");
-  console.log("LOG Plat Nomer Yang diterima:", plate);
+
+  console.log("LOG Plat Nomor:", plate);
 
   if (!plate) {
     return NextResponse.json(
-      { error: "Plat Nomer Tidak Ditemukan Di Database" },
+      { error: "Plat Nomor Tidak Ditemukan Di URL" },
       { status: 400 }
     );
   }
 
   try {
-    const findVehicleData = await prisma.vehicle.findFirst({
-      where: {
-        platNomor: {
-          equals: plate,
-          mode: "insensitive",
-        },
-      },
-    });
-    console.log("LOG Query prisma:", findVehicleData);
+    const vehicle = await getVehicleByPlate(plate);
 
-    if (!findVehicleData) {
+    console.log("LOG Hasil Query:", vehicle);
+
+    if (!vehicle) {
       return NextResponse.json(
         { found: false, message: "Data tidak ditemukan di database" },
-        { status: 400 }
+        { status: 404 }
       );
     }
 
-    return NextResponse.json(
-      {
-        found: true,
-        data: findVehicleData,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({ found: true, data: vehicle }, { status: 200 });
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
