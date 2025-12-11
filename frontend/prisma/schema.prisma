@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  
+  hashedPassword String?
+
+  accounts      Account[]
+  sessions      Session[]
+  histories     ScanHistory[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user         User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Vehicle {
+  id            String   @id @default(cuid())
+  platNomor     String   @unique
+  pemilik       String
+  jenis         String   
+  merk          String
+  model         String
+  warna         String
+  tahun         Int
+  pajakBerakhir DateTime
+  status        String
+  
+  scanHistories ScanHistory[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("vehicles")
+}
+
+model ScanHistory {
+  id           String   @id @default(cuid())
+  
+  imageUrl     String
+  platNomor    String
+  expiryDate   DateTime
+  
+  vehicleId    String?
+  vehicle      Vehicle? @relation(fields: [vehicleId], references: [id])
+  userId    String?
+user      User? @relation(fields: [userId], references: [id])
+
+  createdAt    DateTime @default(now())
+
+  @@map("scan_histories")
+}
