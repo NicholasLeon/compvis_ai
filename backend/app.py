@@ -125,7 +125,7 @@ def preprocess(crop):
     gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
 
     # 3. Noise Removal (MORPH OPEN) - BUAT MENGHILANGKAN GARIS GRILL/TITIK
-    kernel_noise = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    kernel_noise = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 2))
     gray = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel_noise)
 
     # 4. Blur

@@ -1,62 +1,17 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { scanLicensePlate } from "@/lib/scan";
+import { useScanner } from "../hooks/user";
 import { motion, AnimatePresence } from "framer-motion";
+import { UserStatus } from "@/types/user";
 
-const fileToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
-};
-
-export default function HeroScanner() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsLoading(true);
-    setErrorMsg("");
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      // 1. Request ke Backend
-      const data = await scanLicensePlate(formData);
-
-      if (data && data.success) {
-        // 2. Convert gambar yang diupload jadi string
-        const base64Img = await fileToBase64(file);
-
-        // 3. Simpan Data + Gambar ke Session Storage
-        const dataToSave = {
-          ...data, // plate_number, expiry_date, success
-          imageUrl: base64Img,
-        };
-        sessionStorage.setItem("scanResult", JSON.stringify(dataToSave));
-        console.log(data);
-        router.push("/result");
-      } else {
-        setErrorMsg("Plat nomor tidak terbaca atau gagal.");
-      }
-    } catch (err: any) {
-      console.error("Scan error:", err);
-      setErrorMsg("Gagal memproses gambar. Pastikan backend nyala.");
-    } finally {
-      setIsLoading(false);
-      e.target.value = "";
-    }
-  };
+export default function HeroScanner({ isLoggedIn }: UserStatus) {
+  const {
+    isLoading,
+    errorMsg,
+    fileInputRef,
+    handleScanClick,
+    handleFileChange,
+  } = useScanner(isLoggedIn);
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center text-center px-4 w-full relative z-0 -mt-16 sm:-mt-20">
@@ -92,9 +47,9 @@ export default function HeroScanner() {
         </button>
 
         <button
-          onClick={() => fileInputRef.current?.click()}
+          onClick={handleScanClick}
           disabled={isLoading}
-          className="relative group flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-gradient-to-br from-orange-500 to-[#FAA916] hover:bg-amber-50 transition-all font-semibold text-white shadow-lg"
+          className="relative group flex items-center justify-center gap-3 px-6 py-4 rounded-xl bg-linear-to-br from-orange-500 to-[#FAA916] hover:bg-amber-50 transition-all font-semibold text-white shadow-lg cursor-pointer"
         >
           {isLoading ? (
             <motion.div
@@ -103,7 +58,9 @@ export default function HeroScanner() {
               className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full"
             />
           ) : (
-            <span className="text-xl group-hover:rotate-12 transition-transform"></span>
+            <span className="text-xl group-hover:rotate-12 transition-transform">
+              📸
+            </span>
           )}
           <span>{isLoading ? "Memproses..." : "Scan Foto"}</span>
         </button>
@@ -123,7 +80,11 @@ export default function HeroScanner() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="mt-6 text-red-400 bg-red-500/10 px-4 py-2 rounded-lg border border-red-500/20 text-sm"
+            className={`mt-6 px-4 py-2 rounded-lg border text-sm ${
+              errorMsg.includes("login")
+                ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                : "bg-red-500/10 border-red-500/20 text-red-400"
+            }`}
           >
             {errorMsg}
           </motion.div>
