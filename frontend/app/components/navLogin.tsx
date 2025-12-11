@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Logout } from "../../lib/action";
 import { BiLogOut, BiErrorCircle } from "react-icons/bi";
-import { UserProps, UserPropsSchema } from "../../types/user";
+import { UserPropsSchema } from "../../types/user";
 
 export default function navbar({ user }: z.infer<typeof UserPropsSchema>) {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -109,8 +109,8 @@ export default function navbar({ user }: z.infer<typeof UserPropsSchema>) {
                   {/* Tombol ini yang trigger Server Action */}
                   <button
                     onClick={() => {
-                      Logout(); // Panggil server action
-                      setShowLogoutConfirm(false); // Tutup modal (opsional, krn page bakal reload)
+                      Logout();
+                      setShowLogoutConfirm(false);
                     }}
                     className="flex-1 py-2.5 px-4 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 shadow-lg shadow-red-200 transition"
                   >

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 
 export const UserPropsSchema = z.object({
   user: z
@@ -11,3 +11,13 @@ export const UserPropsSchema = z.object({
 });
 
 export type UserProps = z.infer<typeof UserPropsSchema>;
+
+interface HeroScannerProps {
+  isLoggedIn: boolean;
+}
+
+export const userStatusSchema = z.object({
+  isLoggedIn: z.boolean(),
+});
+
+export type UserStatus = z.infer<typeof userStatusSchema>;

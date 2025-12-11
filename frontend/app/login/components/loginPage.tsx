@@ -12,14 +12,13 @@ import {
 } from "react-icons/fa";
 import { BiLogIn } from "react-icons/bi";
 import { FcGoogle } from "react-icons/fc";
-import { signIn } from "@/auth";
 import { GoogleLogin } from "@/lib/action";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-gradient-to-b from-[#FDBD4E] to-[#F2F2F2] p-4 font-sans z-[999] overflow-y-auto">
+    <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-linear-to-b from-[#FDBD4E] to-[#F2F2F2] p-4 font-sans z-[999] overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -28,7 +27,7 @@ export default function LoginPage() {
         className="w-full max-w-md bg-[#F2F2F2] rounded-[2.5rem] overflow-hidden shadow-2xl relative my-auto"
       >
         {/* Header Section */}
-        <div className="bg-gradient-to-b from-[#FDBD4E] to-[#F2F2F2] pt-8 pb-4 px-6 relative">
+        <div className="bg-linear-to-b from-[#FDBD4E] to-[#F2F2F2] pt-8 pb-4 px-6 relative">
           <button className="absolute top-8 left-6 bg-orange-400/20 hover:bg-orange-400/40 text-white p-2 rounded-full transition">
             <FaChevronLeft size={20} />
           </button>
@@ -97,18 +96,18 @@ export default function LoginPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full bg-gradient-to-r from-orange-400 to-amber-500 text-white font-bold py-3.5 rounded-xl shadow-lg mt-4"
+              className="w-full bg-linear-to-r from-orange-400 to-amber-500 text-white font-bold py-3.5 rounded-xl shadow-lg mt-4"
             >
               Login
             </motion.button>
           </form>
 
           <div className="relative flex py-6 items-center">
-            <div className="flex-grow border-t border-gray-400"></div>
-            <span className="flex-shrink mx-4 text-gray-500 text-sm">
+            <div className="grow border-t border-gray-400"></div>
+            <span className="shrink mx-4 text-gray-500 text-sm">
               atau Login Menggunakan
             </span>
-            <div className="flex-grow border-t border-gray-400"></div>
+            <div className="grow border-t border-gray-400"></div>
           </div>
 
           <form action={GoogleLogin}>
