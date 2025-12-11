@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useScanResult } from "@/app/hooks/sessionData";
 import { useSaveScanHistory } from "@/app/hooks/saveScanHistory";
-import { vehicle } from "@/types/vehicle"; // Import tipe dari Zod tadi
+import { vehicle } from "@/types/vehicle";
 
 export default function ResultPage() {
   const scanData = useScanResult();
@@ -37,7 +37,6 @@ export default function ResultPage() {
     }
   }, [scanData]);
 
-  // Helper function untuk format tanggal
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString("id-ID", {
